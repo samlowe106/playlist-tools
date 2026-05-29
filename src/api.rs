@@ -53,81 +53,6 @@ pub async fn fetch_all_items(
     Ok(all_items)
 }
 
-pub async fn push_new_order(
-    client: &Client,
-    items: &[PlaylistItem],
-    playlist_id: &str,
-    api_key: &str,
-    oauth_token: &str,
-) -> Result<()> {
-    /* Pushes new order to YouTube API */
-    for (new_position, item) in items.iter().enumerate() {
-        // Skip items that haven't actually moved — saves quota.
-        if item.snippet.position == new_position as u32 {
-            continue;
-        }
-
-        let body = UpdateBody {
-            id: item.id.clone(),
-            snippet: UpdateSnippet {
-                playlist_id: playlist_id.to_owned(),
-                position: new_position as u32,
-                resource_id: item.snippet.resource_id.clone(),
-            },
-        };
-
-        client
-            .put("https://www.googleapis.com/youtube/v3/playlistItems")
-            .bearer_auth(oauth_token)
-            .query(&[("part", "snippet"), ("key", api_key)])
-            .json(&body)
-            .send()
-            .await
-            .context(format!("PUT playlistItems failed for item {}", item.id))?
-            .error_for_status()
-            .context(format!("YouTube returned an error for item {}", item.id))?;
-
-        println!(
-            "  Moved '{}' to position {}",
-            item.snippet.title, new_position
-        );
-    }
-
-    Ok(())
-}
-
-pub fn parse_iso_duration(s: &str) -> u64 {
-    let s = s.trim_start_matches("PT");
-    let (s, hours) = match s.find('H') {
-        Some(i) => (&s[i + 1..], s[..i].parse::<u64>().unwrap_or(0)),
-        None => (s, 0),
-    };
-    let (s, mins) = match s.find('M') {
-        Some(i) => (&s[i + 1..], s[..i].parse::<u64>().unwrap_or(0)),
-        None => (s, 0),
-    };
-    let secs = s.trim_end_matches('S').parse::<u64>().unwrap_or(0);
-    hours * 3600 + mins * 60 + secs
-}
-
-/*
-pub fn parse_iso_duration(s: &str) -> u64 {
-    let s = s.trim_start_matches("PT");
-    let hours = s
-        .find('H')
-        .map(|i| s[..i].parse::<u64>().unwrap_or(0))
-        .unwrap_or(0);
-    let mins_s = s.find('H').map(|i| &s[i + 1..]).unwrap_or(s);
-    let mins = mins_s
-        .find('M')
-        .map(|i| mins_s[..i].parse::<u64>().unwrap_or(0))
-        .unwrap_or(0);
-    let secs_s = mins_s.find('M').map(|i| &mins_s[i + 1..]).unwrap_or(mins_s);
-    let secs = secs_s.trim_end_matches('S').parse::<u64>().unwrap_or(0);
-    hours * 3600 + mins * 60 + secs
-}
- */
-
 pub async fn fetch_durations(
     client: &Client,
     items: &[PlaylistItem],
@@ -168,4 +93,79 @@ pub async fn fetch_durations(
     }
 
     Ok(durations)
+}
+
+pub async fn push_new_order(
+    client: &Client,
+    items: &[PlaylistItem],
+    playlist_id: &str,
+    api_key: &str,
+    oauth_token: &str,
+) -> Result<()> {
+    /* Pushes new order to YouTube API */
+    for (new_position, item) in items.iter().enumerate() {
+        // Skip items that haven't actually moved to save quota
+        if item.snippet.position == new_position as u32 {
+            continue;
+        }
+
+        let body = UpdateBody {
+            id: item.id.clone(),
+            snippet: UpdateSnippet {
+                playlist_id: playlist_id.to_owned(),
+                position: new_position as u32,
+                resource_id: item.snippet.resource_id.clone(),
+            },
+        };
+
+        client
+            .put("https://www.googleapis.com/youtube/v3/playlistItems")
+            .bearer_auth(oauth_token)
+            .query(&[("part", "snippet"), ("key", api_key)])
+            .json(&body)
+            .send()
+            .await
+            .context(format!("PUT playlistItems failed for item {}", item.id))?
+            .error_for_status()
+            .context(format!("YouTube returned an error for item {}", item.id))?;
+
+        println!(
+            "  Moved '{}' to position {}",
+            item.snippet.title, new_position
+        );
+    }
+
+    Ok(())
+}
+
+/*
+pub fn parse_iso_duration(s: &str) -> u64 {
+    let s = s.trim_start_matches("PT");
+    let hours = s
+        .find('H')
+        .map(|i| s[..i].parse::<u64>().unwrap_or(0))
+        .unwrap_or(0);
+    let mins_s = s.find('H').map(|i| &s[i + 1..]).unwrap_or(s);
+    let mins = mins_s
+        .find('M')
+        .map(|i| mins_s[..i].parse::<u64>().unwrap_or(0))
+        .unwrap_or(0);
+    let secs_s = mins_s.find('M').map(|i| &mins_s[i + 1..]).unwrap_or(mins_s);
+    let secs = secs_s.trim_end_matches('S').parse::<u64>().unwrap_or(0);
+    hours * 3600 + mins * 60 + secs
+}
+ */
+
+fn parse_iso_duration(s: &str) -> u64 {
+    let s = s.trim_start_matches("PT");
+    let (s, hours) = match s.find('H') {
+        Some(i) => (&s[i + 1..], s[..i].parse::<u64>().unwrap_or(0)),
+        None => (s, 0),
+    };
+    let (s, mins) = match s.find('M') {
+        Some(i) => (&s[i + 1..], s[..i].parse::<u64>().unwrap_or(0)),
+        None => (s, 0),
+    };
+    let secs = s.trim_end_matches('S').parse::<u64>().unwrap_or(0);
+    hours * 3600 + mins * 60 + secs
 }
