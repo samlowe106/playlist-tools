@@ -26,15 +26,14 @@ pub fn sort_items(
     /* Sort */
     match order {
         SortOrder::Title => {
-            items.sort_by(|a, b| {
-                a.snippet
-                    .title
-                    .to_lowercase()
-                    .cmp(&b.snippet.title.to_lowercase())
+            items.sort_by_cached_key(|i| {
+                i.snippet.title.to_lowercase()
+                //.cmp(&b.snippet.title.to_lowercase())
             });
         }
         SortOrder::Published => {
-            // ISO 8601 strings sort lexicographically — no parsing needed
+            // ISO 8601 strings sort lexicographically
+            //  no parsing needed
             items.sort_by(|a, b| {
                 a.content_details
                     .video_published_at
@@ -49,7 +48,7 @@ pub fn sort_items(
             });
         }
         SortOrder::Duration => {
-            items.sort_by_key(|i| {
+            items.sort_by_cached_key(|i| {
                 durations
                     .get(&i.content_details.video_id)
                     .copied()
