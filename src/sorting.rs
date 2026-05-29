@@ -4,7 +4,7 @@ use crate::models::PlaylistItem;
 
 use strum::{Display, EnumIter};
 
-#[derive(Debug, Clone, Copy, EnumIter, Display)]
+#[derive(Debug, Clone, Copy, EnumIter, PartialEq, Display)]
 pub enum SortOrder {
     /// Title of the video
     Title,
@@ -17,16 +17,6 @@ pub enum SortOrder {
     /// Reverse the current playlist order
     Reversed,
 }
-
-/* stackoverflow
-impl fmt::Display for SortOrder {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{:?}", self)
-        // or, alternatively:
-        // fmt::Debug::fmt(self, f)
-    }
-}
-*/
 
 pub fn sort_items(
     items: &mut Vec<PlaylistItem>,
@@ -67,7 +57,13 @@ pub fn sort_items(
             });
         }
         SortOrder::UploaderName => {
-            items.sort_by(|a, b| todo!());
+            items.sort_by(|a, b| {
+                a.snippet
+                    .video_owner_channel_title
+                    .as_deref()
+                    .unwrap_or("")
+                    .cmp(b.snippet.video_owner_channel_title.as_deref().unwrap_or(""))
+            });
         }
         SortOrder::Reversed => {
             items.reverse();
