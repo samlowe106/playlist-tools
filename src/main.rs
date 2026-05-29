@@ -14,7 +14,7 @@ use url::Url;
 use visuals::draw_chart;
 
 #[tokio::main]
-async fn main() -> Result<()> {
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
     dotenv::dotenv()?;
     let api_key = std::env::var("YOUTUBE_API_KEY").context("YOUTUBE_API_KEY not set")?;
     let oauth_token =
@@ -53,13 +53,20 @@ async fn main() -> Result<()> {
     let mut items = fetch_all_items(&client, &playlist_id, &api_key, &oauth_token).await?;
     println!("  {} items fetched.", items.len());
 
-    let durations = fetch_durations(&client, &items, &api_key, &oauth_token).await?;
-    println!("  Durations fetched.");
+    let durations = if order == SortOrder::Duration {
+        let durations = fetch_durations(&client, &items, &api_key, &oauth_token).await?;
+        println!("  Durations fetched.");
+        durations
+    } else {
+        HashMap::new()
+    };
 
     println!("Sorting ({:?})…", order);
     sort_items(&mut items, order, &durations);
 
-    draw_chart(&durations.into_values().collect());
+    if order == SortOrder::Duration {
+        draw_chart(&durations.into_values().collect())?;
+    }
 
     println!("Pushing new order…");
     push_new_order(&client, &items, &playlist_id, &api_key, &oauth_token).await?;
