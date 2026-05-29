@@ -1,0 +1,16 @@
+[package]
+name = "playlist-tools"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+# plotters freaks out without these features
+plotters = { version = "0.3.7", features = ["ab_glyph", "fontconfig-dlopen"] }
+reqwest = { version = "0.13.4", features = ["json", "query"] }
+anyhow = "1.0.102"
+dotenv = "0.15.0"
+serde = { version = "1.0.228", features = ["derive"] }
+tokio = { version = "1.52.3", features = ["full"] }
+strum = { version = "0.28", features = ["derive"] }
+regex = "1.12.3"
+url = "2.5.8"
