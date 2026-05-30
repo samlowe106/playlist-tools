@@ -18,11 +18,7 @@ pub enum SortOrder {
     Reversed,
 }
 
-pub fn sort_items(
-    items: &mut Vec<PlaylistItem>,
-    order: SortOrder,
-    durations: &HashMap<String, u64>,
-) {
+pub fn sort_items(items: &mut [PlaylistItem], order: SortOrder, durations: &HashMap<String, u64>) {
     /* Sort */
     match order {
         SortOrder::Title => {

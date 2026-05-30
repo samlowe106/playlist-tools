@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 
 use anyhow::{Context, Result};
-use dotenv;
 mod api;
 mod models;
 mod sorting;
@@ -65,7 +64,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     sort_items(&mut items, order, &durations);
 
     if order == SortOrder::Duration {
-        draw_chart(&durations.into_values().collect())?;
+        draw_chart(&durations.into_values().collect::<Vec<u64>>())?;
     }
 
     println!("Pushing new order…");

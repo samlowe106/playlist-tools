@@ -1,9 +1,7 @@
-use std::vec::Vec;
-
 //use crate::models::{PlaylistItem, PlaylistItemListResponse, UpdateBody, UpdateSnippet};
 use plotters::{prelude::*, style::full_palette::ORANGE};
 
-pub fn draw_chart(durations: &Vec<u64>) -> Result<(), Box<dyn std::error::Error>> {
+pub fn draw_chart(durations: &[u64]) -> Result<(), Box<dyn std::error::Error>> {
     let root = SVGBackend::new("durations.svg", (800, 400)).into_drawing_area();
     root.fill(&WHITE)?;
 
@@ -27,12 +25,12 @@ pub fn draw_chart(durations: &Vec<u64>) -> Result<(), Box<dyn std::error::Error>
                 .data(durations.iter().map(|&x| (x, 1))),
         )?
         .label("y = x^2")
-        .legend(|(x, y)| PathElement::new(vec![(x, y), (x + 20, y)], &RED));
+        .legend(|(x, y)| PathElement::new(vec![(x, y), (x + 20, y)], RED));
 
     chart
         .configure_series_labels()
-        .background_style(&WHITE.mix(0.8))
-        .border_style(&BLACK)
+        .background_style(WHITE.mix(0.8))
+        .border_style(BLACK)
         .draw()?;
 
     root.present()?;
