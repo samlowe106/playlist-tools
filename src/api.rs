@@ -131,7 +131,6 @@ pub async fn push_new_order(
             .context(format!("YouTube returned an error for item {}", item.id))?;
 
         println!("  {} '{}' (MOVED)", position, item.snippet.title);
-        println!("  Moved '{}' to position {}", item.snippet.title, position);
     }
 
     Ok(())
