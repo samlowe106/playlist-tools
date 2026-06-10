@@ -83,6 +83,34 @@ pub async fn get_oauth_token() -> anyhow::Result<String> {
     Ok(token.access_token().secret().to_owned())
 }
 
+pub async fn fetch_playlist_title(
+    client: &Client,
+    playlist_id: &str,
+    api_key: &str,
+    oauth_token: &str,
+) -> anyhow::Result<String> {
+    let response = client
+        .get("https://www.googleapis.com/youtube/v3/playlists")
+        .bearer_auth(oauth_token)
+        .query(&[("part", "snippet"), ("id", playlist_id), ("key", api_key)])
+        .send()
+        .await
+        .context("GET playlists failed")?
+        .error_for_status()
+        .context("YouTube API returned an error on playlists.list")?;
+
+    let page: crate::models::PlaylistListResponse = response
+        .json()
+        .await
+        .context("Failed to deserialise playlists.list response")?;
+
+    page.items
+        .into_iter()
+        .next()
+        .map(|p| p.snippet.title)
+        .context("Playlist not found")
+}
+
 pub async fn fetch_all_items(
     client: &Client,
     playlist_id: &str,

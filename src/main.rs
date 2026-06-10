@@ -7,7 +7,7 @@ mod cache;
 mod models;
 mod sorting;
 mod visuals;
-use api::{fetch_all_items, get_oauth_token, push_new_order};
+use api::{fetch_all_items, fetch_playlist_title, get_oauth_token, push_new_order};
 use reqwest::Client;
 use sorting::{SortOrder, sort_items};
 use url::Url;
@@ -45,7 +45,15 @@ async fn main() -> anyhow::Result<()> {
 
     let client = Client::new();
 
-    println!("Fetching playlist items for {playlist_id}...");
+    let playlist_title = fetch_playlist_title(
+        &client,
+        playlist_id.as_str(),
+        api_key.as_str(),
+        oauth_token.as_str(),
+    )
+    .await?;
+    println!("Found playlist {playlist_title}, fetching playlist items...");
+
     let mut items = fetch_all_items(&client, &playlist_id, &api_key, &oauth_token).await?;
     println!("  {} items fetched.", items.len());
 
@@ -61,7 +69,10 @@ async fn main() -> anyhow::Result<()> {
     sort_items(&mut items, args.order, &durations, args.ascending);
 
     if args.order == SortOrder::Duration {
-        draw_chart(&durations.into_values().collect::<Vec<u64>>())?;
+        draw_chart(
+            format!("{} Video Durations", playlist_title).as_str(),
+            &durations.into_values().collect::<Vec<u64>>(),
+        )?;
     }
 
     println!("Pushing new order…");

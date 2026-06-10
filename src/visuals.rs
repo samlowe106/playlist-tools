@@ -1,6 +1,6 @@
 use plotters::{prelude::*, style::full_palette::ORANGE};
 
-pub fn draw_chart(durations: &[u64]) -> anyhow::Result<()> {
+pub fn draw_chart(title: &str, durations: &[u64]) -> anyhow::Result<()> {
     let root = SVGBackend::new("durations.svg", (800, 400)).into_drawing_area();
     root.fill(&WHITE)?;
 
@@ -17,7 +17,7 @@ pub fn draw_chart(durations: &[u64]) -> anyhow::Result<()> {
     let max_count = counts.iter().copied().max().unwrap_or(1) + 1;
 
     let mut chart = ChartBuilder::on(&root)
-        .caption("Video durations", ("sans-serif", 20))
+        .caption(title, ("sans-serif", 20))
         .margin(20)
         .x_label_area_size(40)
         .y_label_area_size(40)
