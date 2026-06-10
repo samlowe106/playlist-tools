@@ -15,7 +15,6 @@ use visuals::draw_chart;
 #[derive(Parser, Debug)]
 #[command(version, about)]
 struct Args {
-    #[arg(short, long)]
     playlist_id: String,
     #[arg(short, long, default_value = "duration")]
     order: SortOrder,
