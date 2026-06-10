@@ -1,6 +1,36 @@
 # 🔀 Playlist Tools
 
-A command line program to sort YouTube playlists by additional metrics including duration and uploader name using the YouTube Data API v3.
+A command line program to sort YouTube playlists by additional metrics including duration and uploader name using the YouTube Data API v3. Current usage is:
+
+```
+Usage: playlist-tools [OPTIONS] <PLAYLIST_ID>
+
+Arguments:
+  <PLAYLIST_ID>
+
+
+Options:
+  -o, --order <ORDER>
+          Possible values:
+          - title:         Title of the video
+          - published:     Date the video was published
+          - duration:      Duration of the YouTube video
+          - uploader-name: Name of the YouTube channel that uploaded it
+
+          [default: duration]
+
+  -a, --ascending
+
+
+      --start-position <START_POSITION>
+          [default: 0]
+
+  -h, --help
+          Print help (see a summary with '-h')
+
+  -V, --version
+          Print version
+```
 
 ## Setup
 ### 1. Prerequisites
@@ -34,7 +64,7 @@ A command line program to sort YouTube playlists by additional metrics including
 
 ```bash
 cargo build --release
-./target/release/playlist-tools --playlist-id "https://www.youtube.com/playlist?list=YOUR_PLAYLIST_ID"
+./target/release/playlist-tools "https://www.youtube.com/playlist?list=YOUR_PLAYLIST_ID"
 ```
 
 On first run, your browser window will open asking you to authenticate with Google. After approving, the app will fetch your playlist, sort it, and push the new order to YouTube.
@@ -43,5 +73,5 @@ On first run, your browser window will open asking you to authenticate with Goog
 
 The YouTube API has a daily quota of 10,000 units. Each video reorder costs 50 units, so large playlists may need to be processed over multiple days. Use `--start-position N` to resume from where you left off:
 ```bash
-./target/release/playlist-tools --playlist-id "https://..." --start-position N
+./target/release/playlist-tools "https://..." --start-position N
 ```
