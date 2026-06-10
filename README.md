@@ -43,5 +43,5 @@ On first run, your browser window will open asking you to authenticate with Goog
 
 The YouTube API has a daily quota of 10,000 units. Each video reorder costs 50 units, so large playlists may need to be processed over multiple days. Use `--start-position N` to resume from where you left off:
 ```bash
-./target/release/playlist-tools --playlist-id "https://..." --start-position 135
+./target/release/playlist-tools --playlist-id "https://..." --start-position N
 ```
