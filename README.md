@@ -20,9 +20,11 @@ Options:
           [default: duration]
 
   -a, --ascending
-
+          Sort in ascending order (least to greatest)
 
       --start-position <START_POSITION>
+          Resume pushing from this position (useful if you hit the daily API quota limit in a previous run)
+
           [default: 0]
 
   -h, --help
