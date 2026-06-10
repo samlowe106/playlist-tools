@@ -14,11 +14,16 @@ pub enum SortOrder {
     Duration,
     /// Name of the YouTube channel that uploaded it
     UploaderName,
-    /// Reverse the current playlist order
-    Reversed,
+    // Reverse the current playlist order
+    //Reversed,
 }
 
-pub fn sort_items(items: &mut [PlaylistItem], order: SortOrder, durations: &HashMap<String, u64>) {
+pub fn sort_items(
+    items: &mut [PlaylistItem],
+    order: SortOrder,
+    durations: &HashMap<String, u64>,
+    asending: bool,
+) {
     /* Sort */
     match order {
         SortOrder::Title => {
@@ -60,8 +65,9 @@ pub fn sort_items(items: &mut [PlaylistItem], order: SortOrder, durations: &Hash
                     .cmp(b.snippet.video_owner_channel_title.as_deref().unwrap_or(""))
             });
         }
-        SortOrder::Reversed => {
-            items.reverse();
-        }
-    }
+    };
+
+    if asending {
+        items.reverse();
+    };
 }
