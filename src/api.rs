@@ -103,9 +103,10 @@ pub async fn push_new_order(
     oauth_token: &str,
 ) -> Result<()> {
     /* Pushes new order to YouTube API */
-    for (new_position, item) in items.iter().enumerate() {
+    for (position, item) in items.iter().enumerate() {
         // Skip items that haven't actually moved to save quota
-        if item.snippet.position == new_position as u32 {
+        if item.snippet.position == position as u32 {
+            println!("  {} '{}' (SAME)", position, item.snippet.title);
             continue;
         }
 
@@ -113,7 +114,7 @@ pub async fn push_new_order(
             id: item.id.clone(),
             snippet: UpdateSnippet {
                 playlist_id: playlist_id.to_owned(),
-                position: new_position as u32,
+                position: position as u32,
                 resource_id: item.snippet.resource_id.clone(),
             },
         };
@@ -129,10 +130,8 @@ pub async fn push_new_order(
             .error_for_status()
             .context(format!("YouTube returned an error for item {}", item.id))?;
 
-        println!(
-            "  Moved '{}' to position {}",
-            item.snippet.title, new_position
-        );
+        println!("  {} '{}' (MOVED)", position, item.snippet.title);
+        println!("  Moved '{}' to position {}", item.snippet.title, position);
     }
 
     Ok(())
