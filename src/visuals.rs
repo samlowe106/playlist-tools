@@ -1,7 +1,7 @@
 //use crate::models::{PlaylistItem, PlaylistItemListResponse, UpdateBody, UpdateSnippet};
 use plotters::{prelude::*, style::full_palette::ORANGE};
 
-pub fn draw_chart(durations: &[u64]) -> Result<(), Box<dyn std::error::Error>> {
+pub fn draw_chart(durations: &[u64]) -> anyhow::Result<()> {
     let root = SVGBackend::new("durations.svg", (800, 400)).into_drawing_area();
     root.fill(&WHITE)?;
 
