@@ -4,13 +4,14 @@ use crate::models::PlaylistItem;
 
 use strum::Display;
 
-#[derive(Debug, Clone, Copy, PartialEq, Display, clap::ValueEnum)]
+#[derive(Debug, Clone, Copy, PartialEq, Display, clap::ValueEnum, Default)]
 pub enum SortOrder {
     /// Title of the video
     Title,
     /// Date the video was published
     Published,
     /// Duration of the YouTube video
+    #[default]
     Duration,
     /// Name of the YouTube channel that uploaded it
     UploaderName,
