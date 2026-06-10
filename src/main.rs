@@ -3,10 +3,11 @@ use std::collections::HashMap;
 use anyhow::Context;
 use clap::Parser;
 mod api;
+mod cache;
 mod models;
 mod sorting;
 mod visuals;
-use api::{fetch_all_items, fetch_durations, get_oauth_token, push_new_order};
+use api::{fetch_all_items, get_oauth_token, push_new_order};
 use reqwest::Client;
 use sorting::{SortOrder, sort_items};
 use url::Url;
@@ -49,7 +50,7 @@ async fn main() -> anyhow::Result<()> {
     println!("  {} items fetched.", items.len());
 
     let durations = if args.order == SortOrder::Duration {
-        let durations = fetch_durations(&client, &items, &api_key, &oauth_token).await?;
+        let durations = cache::fetch_durations(&client, &items, &api_key, &oauth_token).await?;
         println!("  Durations fetched.");
         durations
     } else {
