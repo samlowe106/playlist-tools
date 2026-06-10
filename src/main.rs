@@ -11,7 +11,7 @@ use api::{fetch_all_items, fetch_playlist_title, get_oauth_token, push_new_order
 use reqwest::Client;
 use sorting::{SortOrder, sort_items};
 use url::Url;
-use visuals::draw_chart;
+use visuals::draw_durations_chart;
 
 #[derive(Parser, Debug)]
 #[command(version, about)]
@@ -69,7 +69,7 @@ async fn main() -> anyhow::Result<()> {
     sort_items(&mut items, args.order, &durations, args.ascending);
 
     if args.order == SortOrder::Duration {
-        draw_chart(
+        draw_durations_chart(
             format!("{} Video Durations", playlist_title).as_str(),
             &durations.into_values().collect::<Vec<u64>>(),
         )?;

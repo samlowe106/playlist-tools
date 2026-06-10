@@ -1,6 +1,6 @@
 use plotters::{prelude::*, style::full_palette::ORANGE};
 
-pub fn draw_chart(title: &str, durations: &[u64]) -> anyhow::Result<()> {
+pub fn draw_durations_chart(title: &str, durations: &[u64]) -> anyhow::Result<()> {
     let root = SVGBackend::new("durations.svg", (800, 400)).into_drawing_area();
     root.fill(&WHITE)?;
 
