@@ -1,15 +1,12 @@
 use std::collections::HashMap;
 
-mod auth;
-use auth::get_oauth_token;
-
 use anyhow::Context;
 use clap::Parser;
 mod api;
 mod models;
 mod sorting;
 mod visuals;
-use api::{fetch_all_items, fetch_durations, push_new_order};
+use api::{fetch_all_items, fetch_durations, get_oauth_token, push_new_order};
 use reqwest::Client;
 use sorting::{SortOrder, sort_items};
 use url::Url;
