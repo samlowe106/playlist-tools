@@ -68,7 +68,7 @@ pub fn sort_items(
         }
     };
 
-    if asending {
+    if !asending {
         items.reverse();
     };
 }
