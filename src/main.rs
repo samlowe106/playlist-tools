@@ -18,8 +18,10 @@ struct Args {
     playlist_id: String,
     #[arg(short, long, default_value = "duration")]
     order: SortOrder,
+    /// Sort in ascending order (least to greatest)
     #[arg(short, long, default_value_t = true)]
     ascending: bool,
+    /// Resume pushing from this position (useful if you hit the daily API quota limit in a previous run)
     #[arg(long, default_value_t = 0)]
     start_position: usize,
 }
