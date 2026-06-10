@@ -20,7 +20,7 @@ use visuals::draw_chart;
 struct Args {
     #[arg(short, long)]
     playlist_id: String,
-    #[arg(short, long, default_value_t = SortOrder::Duration)]
+    #[arg(short, long, default_value = "duration")]
     order: SortOrder,
     #[arg(short, long, default_value_t = true)]
     ascending: bool,
