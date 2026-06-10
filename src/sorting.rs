@@ -2,9 +2,9 @@ use std::collections::HashMap;
 
 use crate::models::PlaylistItem;
 
-use strum::{Display, EnumIter};
+use strum::Display;
 
-#[derive(Debug, Clone, Copy, EnumIter, PartialEq, Display)]
+#[derive(Debug, Clone, Copy, PartialEq, Display, clap::ValueEnum)]
 pub enum SortOrder {
     /// Title of the video
     Title,
