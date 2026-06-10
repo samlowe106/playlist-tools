@@ -101,9 +101,14 @@ pub async fn push_new_order(
     playlist_id: &str,
     api_key: &str,
     oauth_token: &str,
+    start_position: usize,
 ) -> Result<()> {
-    /* Pushes new order to YouTube API */
     for (position, item) in items.iter().enumerate() {
+        // Skip items before the start position
+        if position < start_position {
+            continue;
+        }
+
         // Skip items that haven't actually moved to save quota
         if item.snippet.position == position as u32 {
             println!("  {} '{}' (SAME)", position, item.snippet.title);

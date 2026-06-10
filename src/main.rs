@@ -16,14 +16,16 @@ use url::Url;
 use visuals::draw_chart;
 
 #[derive(Parser, Debug)]
-#[command(version, about, long_about = None)]
+#[command(version, about)]
 struct Args {
     #[arg(short, long)]
     playlist_id: String,
     #[arg(short, long, default_value = "duration")]
     order: SortOrder,
-    #[arg(short, long, default_value_t = false)]
+    #[arg(short, long, default_value_t = true)]
     ascending: bool,
+    #[arg(long, default_value_t = 0)]
+    start_position: usize,
 }
 
 #[tokio::main]
@@ -64,7 +66,15 @@ async fn main() -> anyhow::Result<()> {
     }
 
     println!("Pushing new order…");
-    push_new_order(&client, &items, &playlist_id, &api_key, &oauth_token).await?;
+    push_new_order(
+        &client,
+        &items,
+        &playlist_id,
+        &api_key,
+        &oauth_token,
+        args.start_position,
+    )
+    .await?;
 
     Ok(())
 }
