@@ -2,16 +2,14 @@ use crate::models::{
     PlaylistItem, PlaylistItemListResponse, UpdateBody, UpdateSnippet, VideoListResponse,
 };
 use anyhow::{Context, Result};
-use reqwest::Client;
-use std::collections::HashMap;
-
 use oauth2::basic::BasicClient;
 use oauth2::reqwest::async_http_client;
-
 use oauth2::{
     AuthUrl, AuthorizationCode, ClientId, ClientSecret, CsrfToken, RedirectUrl, Scope,
     TokenResponse, TokenUrl,
 };
+use reqwest::Client;
+use std::collections::HashMap;
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
 use tokio::net::TcpListener;
 use url::Url;
@@ -239,7 +237,7 @@ pub fn parse_iso_duration(s: &str) -> u64 {
 }
  */
 
-fn parse_iso_duration(s: &str) -> u64 {
+pub fn parse_iso_duration(s: &str) -> u64 {
     let s = s.trim_start_matches("PT");
     let (s, hours) = match s.find('H') {
         Some(i) => (&s[i + 1..], s[..i].parse::<u64>().unwrap_or(0)),
