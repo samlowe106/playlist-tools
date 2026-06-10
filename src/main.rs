@@ -22,7 +22,7 @@ struct Args {
     playlist_id: String,
     #[arg(short, long, default_value = "duration")]
     order: SortOrder,
-    #[arg(short, long, default_value_t = true)]
+    #[arg(short, long, default_value_t = false)]
     ascending: bool,
 }
 
