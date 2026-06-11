@@ -1,5 +1,7 @@
 # 🔀 Playlist Tools
 
+![](0_Watch_Later_Durations.svg)_Duration histogram of my playlist 0 Watch Later. (Yes, the 0 is intentional, it makes it appear first in my playlists tab)_
+
 A command line program to sort YouTube playlists by additional metrics including duration and uploader name using the YouTube Data API v3. Current usage is:
 
 ```
