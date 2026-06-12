@@ -122,16 +122,15 @@ pub async fn fetch_all_items(
     let mut page_token: Option<String> = None;
 
     loop {
-        // can params and the params.insert be combined and made immutable?
-        let mut params: HashMap<&str, String> = HashMap::from([
+        let params: HashMap<&str, String> = [
             ("part", "snippet,contentDetails".into()),
             ("playlistId", playlist_id.into()),
-            ("maxResults", "50".into()), // 50 is the API maximum
+            ("maxResults", "50".into()),
             ("key", api_key.into()),
-        ]);
-        if let Some(ref token) = page_token {
-            params.insert("pageToken", token.clone());
-        }
+        ]
+        .into_iter()
+        .chain(page_token.as_deref().map(|t| ("pageToken", t.to_string())))
+        .collect();
 
         let response = client
             .get("https://www.googleapis.com/youtube/v3/playlistItems")
