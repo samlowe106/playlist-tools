@@ -52,20 +52,18 @@ async fn main() -> anyhow::Result<()> {
         oauth_token.as_str(),
     )
     .await?;
-    println!("Found playlist {playlist_title}, fetching playlist items...");
+    print!("Found playlist {playlist_title}, fetching playlist items...");
 
     let mut items = fetch_all_items(&client, &playlist_id, &api_key, &oauth_token).await?;
-    println!("  {} items fetched.", items.len());
+    println!("{} items fetched.", items.len());
 
     let durations = if args.order == SortOrder::Duration {
-        let durations = cache::fetch_durations(&client, &items, &api_key, &oauth_token).await?;
-        println!("  Durations fetched.");
-        durations
+        cache::fetch_durations(&client, &items, &api_key, &oauth_token).await?
     } else {
         HashMap::new()
     };
 
-    println!("Sorting ({:?})…", args.order);
+    println!("Sorting by ({:?})…", args.order);
     sort_items(&mut items, args.order, &durations, args.ascending);
 
     if args.order == SortOrder::Duration {
