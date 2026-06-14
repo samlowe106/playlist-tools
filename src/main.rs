@@ -7,7 +7,9 @@ mod cache;
 mod models;
 mod sorting;
 mod visuals;
-use api::{fetch_all_items, fetch_playlist_title, get_oauth_token, push_new_order};
+use api::{
+    fetch_all_items, fetch_playlist_title, get_oauth_token, push_new_order, remove_duplicates,
+};
 use reqwest::Client;
 use sorting::{SortOrder, sort_items};
 use url::Url;
@@ -25,6 +27,12 @@ struct Args {
     /// Resume pushing from this position (useful if you hit the daily API quota limit in a previous run)
     #[arg(long, default_value_t = 0)]
     start_position: usize,
+    /// Delete duplicates from the playlist
+    #[arg(long, default_value_t = false)]
+    remove_duplicates: bool,
+    /// Graph statistics
+    #[arg(long)]
+    graph: Vec<String>,
 }
 
 #[tokio::main]
@@ -62,6 +70,13 @@ async fn main() -> anyhow::Result<()> {
     } else {
         HashMap::new()
     };
+
+    if args.remove_duplicates {
+        let removed = remove_duplicates(&client, &items, &api_key, &oauth_token).await?;
+        println!("  Removed {} duplicates.", removed);
+        // Re-fetch items so positions are accurate after deletions
+        items = fetch_all_items(&client, &playlist_id, &api_key, &oauth_token).await?;
+    }
 
     println!("Sorting by ({:?})…", args.order);
     sort_items(&mut items, args.order, &durations, args.ascending);

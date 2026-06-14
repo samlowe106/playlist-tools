@@ -277,3 +277,38 @@ pub fn parse_iso_duration(s: &str) -> u64 {
     let secs = s.trim_end_matches('S').parse::<u64>().unwrap_or(0);
     hours * 3600 + mins * 60 + secs
 }
+
+pub async fn remove_duplicates(
+    client: &Client,
+    items: &[PlaylistItem],
+    api_key: &str,
+    oauth_token: &str,
+) -> anyhow::Result<usize> {
+    let duplicates: Vec<&PlaylistItem> = {
+        let mut seen = std::collections::HashSet::new();
+
+        items
+            .iter()
+            .filter(|item| !seen.insert(&item.content_details.video_id))
+            .collect()
+    };
+
+    for item in &duplicates {
+        println!("  Removing duplicate: '{}'", item.snippet.title);
+
+        client
+            .delete("https://www.googleapis.com/youtube/v3/playlistItems")
+            .bearer_auth(oauth_token)
+            .query(&[("id", item.id.as_str()), ("key", api_key)])
+            .send()
+            .await
+            .context(format!("DELETE playlistItems failed for item {}", item.id))?
+            .error_for_status()
+            .context(format!(
+                "YouTube returned an error deleting item {}",
+                item.id
+            ))?;
+    }
+
+    Ok(duplicates.len())
+}
