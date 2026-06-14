@@ -13,7 +13,7 @@ use api::{
 use reqwest::Client;
 use sorting::{SortOrder, sort_items};
 use url::Url;
-use visuals::draw_durations_chart;
+use visuals::{GraphOption, draw_durations_chart, draw_uploaders_chart};
 
 #[derive(Parser, Debug)]
 #[command(version, about)]
@@ -32,7 +32,7 @@ struct Args {
     remove_duplicates: bool,
     /// Graph statistics
     #[arg(long)]
-    graph: Vec<String>,
+    graph: Vec<GraphOption>,
 }
 
 #[tokio::main]
@@ -65,10 +65,15 @@ async fn main() -> anyhow::Result<()> {
     let mut items = fetch_all_items(&client, &playlist_id, &api_key, &oauth_token).await?;
     println!("{} items fetched.", items.len());
 
-    let durations = if args.order == SortOrder::Duration {
-        cache::fetch_durations(&client, &items, &api_key, &oauth_token).await?
-    } else {
-        HashMap::new()
+    let durations = {
+        let durations_needed =
+            args.order == SortOrder::Duration || args.graph.contains(&GraphOption::Durations);
+
+        if durations_needed {
+            cache::fetch_durations(&client, &items, &api_key, &oauth_token).await?
+        } else {
+            HashMap::new()
+        }
     };
 
     if args.remove_duplicates {
@@ -81,11 +86,22 @@ async fn main() -> anyhow::Result<()> {
     println!("Sorting by ({:?})…", args.order);
     sort_items(&mut items, args.order, &durations, args.ascending);
 
-    if args.order == SortOrder::Duration {
-        draw_durations_chart(
-            format!("{} Video Durations", playlist_title).as_str(),
-            &durations.into_values().collect::<Vec<u64>>(),
-        )?;
+    for graph in args.graph {
+        match graph {
+            GraphOption::Durations => {
+                draw_durations_chart(
+                    &format!("{} Video Durations", playlist_title),
+                    &durations.values().copied().collect::<Vec<u64>>(),
+                )?;
+            }
+            GraphOption::Uploaders => {
+                let uploaders: Vec<String> = items
+                    .iter()
+                    .filter_map(|i| i.snippet.video_owner_channel_title.clone())
+                    .collect();
+                draw_uploaders_chart(&format!("{} Uploaders", playlist_title), &uploaders)?;
+            }
+        }
     }
 
     println!("Pushing new order…");
